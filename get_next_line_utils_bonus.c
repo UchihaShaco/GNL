@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jalwahei <jalwahei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/25 17:57:56 by jalwahei          #+#    #+#             */
-/*   Updated: 2022/11/13 16:50:58 by jalwahei         ###   ########.fr       */
+/*   Updated: 2022/11/12 20:37:59 by jalwahei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 size_t	ft_strlen(const char *s)
 {
@@ -29,8 +29,6 @@ char	*ft_strchr(const char *s, int c)
 
 	i = 0;
 	str = (char *)s;
-	if (!str[0])
-		return (NULL);
 	while (str[i] != '\0')
 	{
 		if (str[i] == (unsigned char)c)
@@ -42,13 +40,13 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-char	*ft_strjoin(char *s1, char *s2)
+char	*ft_strjoin(char *s1, char const *s2)
 {
 	size_t	i;
 	char	*str;
 	size_t	j;
 
-	if (!s1 || !s2)
+	if (!s1 && !s2)
 		return (NULL);
 	i = 0;
 	j = 0;

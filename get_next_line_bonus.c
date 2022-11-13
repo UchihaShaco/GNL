@@ -1,35 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jalwahei <jalwahei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/25 15:49:15 by jalwahei          #+#    #+#             */
-/*   Updated: 2022/11/13 19:30:40 by jalwahei         ###   ########.fr       */
+/*   Updated: 2022/11/13 19:38:52 by jalwahei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*ft_strdup(char *s1)
 {
 	int		s1_len;
 	char	*str_copy;
-	int		i;
 
 	s1_len = ft_strlen(s1);
-	str_copy = malloc(sizeof(*str_copy) * (s1_len + 1));
-	if (str_copy)
-	{
-		i = 0;
-		while (s1[i] != '\0')
-		{
-			str_copy[i] = s1[i];
-			i++;
-		}
-		str_copy[i] = '\0';
-	}
+	str_copy = malloc(sizeof(*str_copy) * (1));
+	str_copy[0] = '\0';
 	return (str_copy);
 }
 
@@ -116,15 +106,15 @@ char	*ft_free(char *buffer)
 
 char	*get_next_line(int fd)
 {
-	static char		*buffer;
+	static char		*buffer[1024];
 	char			*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || BUFFER_SIZE > 2147483646)
 		return (NULL);
-	buffer = read_line(fd, buffer);
-	if (!buffer)
+	buffer[fd] = read_line(fd, buffer[fd]);
+	if (!buffer[fd])
 		return (NULL);
-	line = ft_getline(buffer);
-	buffer = ft_free(buffer);
+	line = ft_getline(buffer[fd]);
+	buffer[fd] = ft_free(buffer[fd]);
 	return (line);
 }

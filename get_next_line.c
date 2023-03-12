@@ -1,130 +1,77 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jalwahei <jalwahei@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/25 15:49:15 by jalwahei          #+#    #+#             */
-/*   Updated: 2022/11/13 19:30:40 by jalwahei         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
+/*
+**	Write a function that returns a line read from a
+**	file descriptor(fd).
+**	Return value: 
+**		Read line: correct behavior.
+**		NULL: there is nothing else to read, or an error occurred
+*/
+
+/* 
+save: Static variable to save the read bytes 
+will  be used the next time the function is called
+line: stores the current line combination
+with  the part already read previously
+buf:  Stores what is currently being read
+read: Integer variable that counts how many bytes were read
+n:    To know where the next line starts
+str:  save the total string to be returned
+temp: Temporarily store the save str
+
+//Buf to store what was read (buf[BUFFER_SIZE])
+// join the old line with the current line (strjoin)
+// Return whenever it finds the end of the line
+// remove from static_var what has already been returned
+*/
 #include "get_next_line.h"
 
-char	*ft_strdup(char *s1)
-{
-	int		s1_len;
-	char	*str_copy;
-	int		i;
-
-	s1_len = ft_strlen(s1);
-	str_copy = malloc(sizeof(*str_copy) * (s1_len + 1));
-	if (str_copy)
-	{
-		i = 0;
-		while (s1[i] != '\0')
-		{
-			str_copy[i] = s1[i];
-			i++;
-		}
-		str_copy[i] = '\0';
-	}
-	return (str_copy);
-}
-
-char	*read_line(int fd, char *static_buffer)
-{
-	int		k;
-	char	*buffer;
-
-	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (!buffer)
-		return (NULL);
-	k = 1;
-	if (!static_buffer)
-		static_buffer = ft_strdup("");
-	while (!ft_strchr(static_buffer, '\n') && k != 0)
-	{
-		k = read(fd, buffer, BUFFER_SIZE);
-		if (k == -1)
-		{
-			free(buffer);
-			free(static_buffer);
-			return (NULL);
-		}
-		buffer[k] = '\0';
-		static_buffer = ft_strjoin(static_buffer, buffer);
-	}
-	free(buffer);
-	return (static_buffer);
-}
-
-char	*ft_getline(char *read)
-{
-	char	*line;
-	int		i;
-
-	i = 0;
-	if (!read[i])
-		return (NULL);
-	while (read[i] && read[i] != '\n')
-		i++;
-	line = (char *)malloc(sizeof(char) * (i + 2));
-	if (!line)
-		return (NULL);
-	i = 0;
-	while (read[i] && read[i] != '\n')
-	{
-		line[i] = read[i];
-		i++;
-	}
-	if (read[i] == '\n' || read[i] == '\0')
-	{
-		line[i] = read[i];
-		i++;
-	}
-	line[i] = '\0';
-	return (line);
-}
-
-char	*ft_free(char *buffer)
-{
-	int		i;
-	int		j;
-	char	*saving;
-
-	i = 0;
-	while (buffer[i] && buffer[i] != '\n')
-		i++;
-	if (!buffer[i])
-	{
-		free(buffer);
-		return (NULL);
-	}
-	saving = (char *)malloc(sizeof(char) * (ft_strlen(buffer) - i + 1));
-	if (!saving)
-		return (NULL);
-	i++;
-	j = 0;
-	while (buffer[i])
-		saving[j++] = buffer[i++];
-	saving[j] = '\0';
-	free(buffer);
-	return (saving);
-}
+char	*save_the_line(char **save);
 
 char	*get_next_line(int fd)
 {
-	static char		*buffer;
-	char			*line;
+	static char	*save;
+	char		*line;
+	char		buf[BUFFER_SIZE + 1];
+	int			ler;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || BUFFER_SIZE > 2147483646)
 		return (NULL);
-	buffer = read_line(fd, buffer);
-	if (!buffer)
+	ler = read (fd, buf, 2);
+	if (ler == -1)
 		return (NULL);
-	line = ft_getline(buffer);
-	buffer = ft_free(buffer);
-	return (line);
+	while (ler > 0)
+	{
+		buf[ler] = '\0';
+		if (save == NULL)
+			save = ft_strdup("");
+		line = ft_strjoin(save, buf);
+		free (save);
+		save = line;
+		ler = read(fd, buf, BUFFER_SIZE);
+	}
+	return (save_the_line(&save));
+}
+
+char	*save_the_line(char **save)
+{
+	int		n;
+	char	*temporary;
+	char	*str;
+
+	if (!*save)
+		return (NULL);
+	n = ft_strchr(*save, '\n'); 
+	if (n >= 0)
+	{
+		str = ft_substr(*save, 0, n + 1); 
+		temporary = ft_substr(*save, n + 1, ft_strlen(*save) - n); 
+		*save = temporary;
+		if (**save != '\0')
+			return (str);
+	}
+	else
+		str = ft_strdup(*save);
+	free(*save);
+	*save = 0;
+	return (str);
 }
